@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    /* 按錯倒扣 -1分跳警告 */
+    #container {
+      margin: auto;
+      width: 400px;
+      height: 400px;
+    }
+
+    .box {
+      float: left;
+      width: 23px;
+      height: 23px;
+    }
+
+    .boxy {
+      float: left;
+      width: 23px;
+      height: 23px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+  <input type="button" value="開始" id="btn-start">
+  <br>
+  <p>分數: <span id="text-score">0</span></p>
+  <p>剩餘: <span id="text-time">0</span> 秒</p>
+  <script src="../jquery-3.6.0.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    let score = 0
+    let countdown = 30
+    let timer = 0
+
+    const rand = (min, max) => {
+      return Math.round(Math.random() * (max - min)) + min
+    }
+
+    // 顏色調整
+    let num = rand(128, 150)
+    let num2 = rand(128, 150)
+    let n = `background-color: rgb(${num},128,${num2})`
+    let counter = 0
+
+    const change = () => {
+      for (let i = 0; i < 256; i++) {
+        console.log(num)
+        console.log(num2);
+        $('#container').append(`
+        <div class="box" style="${n}; border: solid 1px lightgray;" >
+        </div>
+      `)
+      }
+      let randnumber = Math.floor(Math.random() * 256)
+      const grid = $(`<div class="boxy" style="background-color: rgb(${num - 100}, 128, ${num2 - 100})" >
+        </div>`)
+      console.log(num);
+      console.log(`${num2 - 100}`);
+      $('.box').eq(randnumber).append(grid)
+    }
+
+    $('#btn-start').click(function () {
+      change()
+      $(this).attr('disabled', true)
+      score = 0
+      $('#text-score').text(score)
+      countdown = 60
+      $('#text-time').text(countdown)
+
+      timer = setInterval(() => {
+        countdown--
+        $('#text-time').text(countdown)
+
+        if (countdown <= 0) {
+          clearInterval(timer)
+          Swal.fire({
+            icon: 'info',
+            title: '好可惜！差點就過關了(๑•́ ₃ •̀๑)',
+            text: `你得到 ${score} 分`
+          })
+          $(this).attr('disabled', false)
+        }
+      }, 1000);
+    })
+
+    $('#container').on('click', '.boxy', function () {
+      score++
+      $('#text-score').text(score)
+      counter++
+      $('.box').remove()
+      change()
+      num += 20
+      num2 += 20
+      $('.box').css("background-color", `rgb(${num}, 128, ${num2})`)
+      $(this).css("background-color", `rgb(${num}, 128, ${num2})`)
+      console.log(num)
+      console.log(num2)
+      console.log(counter)
+      if (counter == 25) {
+        clearInterval(timer)
+        $(this).remove()
+        Swal.fire({
+          icon: 'success',
+          title: '恭喜過關｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡',
+          text: `你得到 ${score} 分`
+        })
+      }
+    })
+
+  </script>
+</body>
+
+</html>
