@@ -5,11 +5,96 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Freckle+Face&family=New+Tegomin&display=swap" rel="stylesheet">
   <title>Document</title>
   <style>
+    /* 音量位置 */
     /* 按錯倒扣 -1分跳警告 */
+    /* 遊戲結束消失畫面 */
+
+    body {
+      font-family: 'Freckle Face', cursive;
+      font-family: 'New Tegomin', serif;
+    }
+
+    #container img {
+      height: 500px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-image: url(./bg.jpg);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      transition: opacity 1s;
+    }
+
+    #big {
+      height: 500px;
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-image: url(./bg.jpg);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      /* transition: opacity 1s; */
+    }
+
+    #btn-start {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      margin-top: 27%;
+    }
+
+    #btn-start:hover {
+      cursor: pointer;
+    }
+
+    #rule {
+      position: absolute;
+      top: 80.5%;
+      left: 23%;
+    }
+
+    #rule:hover {
+      cursor: pointer;
+    }
+
+    #sound {
+      position: absolute;
+      top: 80.5%;
+      left: 52.5%;
+    }
+
+    #sound:hover {
+      cursor: pointer;
+    }
+
+    #death {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 250px;
+    }
+
+
+    #clock {
+      position: absolute;
+      font-size: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 75%;
+    }
+
     #container {
-      margin: auto;
       width: 400px;
       height: 400px;
     }
@@ -29,26 +114,40 @@
 </head>
 
 <body>
-  <div id="container"></div>
-  <input type="button" value="開始" id="btn-start">
-  <br>
-  <p>分數: <span id="text-score">0</span></p>
-  <p>剩餘: <span id="text-time">0</span> 秒</p>
-  <script src="../jquery-3.6.0.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <div id="big">
+
+    <img src="./start.png" id="btn-start" width="220px">
+    <img src="./rule.png" id="rule" width="102px">
+    <img src="./sound.png" id="sound" width="102px">
+
+    <div id="container"></div>
+  </div>
+  <div id="clock">
+    <img src="./clock.png" width="25px">
+    <span id="text-time"> 0</span>
+    <span id="number">&emsp;&emsp;score:<span id="text-score">0</span></span>
+  </div>
+  <audio src="./death (2).mp3" id="death" controls></audio>
+
+  <script src="./jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script>
     let score = 0
-    let countdown = 30
+    let countdown = 10
     let timer = 0
+    let timer2 = 0
+    const audio = document.getElementById('death')
+    audio.src = './death (2).mp3'
+
 
     const rand = (min, max) => {
       return Math.round(Math.random() * (max - min)) + min
     }
 
-    // 顏色調整
-    let num = rand(128, 150)
-    let num2 = rand(128, 150)
-    let n = `background-color: rgb(${num},128,${num2})`
+
+    let num = rand(200, 201)
+    let num2 = rand(100, 101)
+    let n = `background-color: rgb(${num},150,${num2})`
     let counter = 0
 
     const change = () => {
@@ -61,19 +160,22 @@
       `)
       }
       let randnumber = Math.floor(Math.random() * 256)
-      const grid = $(`<div class="boxy" style="background-color: rgb(${num - 100}, 128, ${num2 - 100})" >
+      const grid = $(`<div class="boxy" style="background-color: rgb(${num - 200}, 150, ${num2})" >
         </div>`)
-      console.log(num);
-      console.log(`${num2 - 100}`);
       $('.box').eq(randnumber).append(grid)
     }
 
     $('#btn-start').click(function () {
+      $('#btn-start').css('display', 'none')
+      $('#rule').css('display', 'none')
+      $('#sound').css('display', 'none')
+      $('#big').css('background-image', 'none')
+
       change()
       $(this).attr('disabled', true)
       score = 0
       $('#text-score').text(score)
-      countdown = 60
+      countdown = 10
       $('#text-time').text(countdown)
 
       timer = setInterval(() => {
@@ -82,14 +184,41 @@
 
         if (countdown <= 0) {
           clearInterval(timer)
+          audio.remove()
+          $('#container').empty()
+          $('#clock').css('display', 'none')
           Swal.fire({
             icon: 'info',
-            title: '好可惜！差點就過關了(๑•́ ₃ •̀๑)',
+            title: '殘念！差點就過關了(๑•́ ₃ •̀๑)',
             text: `你得到 ${score} 分`
           })
-          $(this).attr('disabled', false)
+
+          $('#btn-start').css('display', '')
+          $('#rule').css('display', '')
+          $('#sound').css('display', '')
+          $('#big').css('background-image', 'url(./bg.jpg)')
+          $('#clock').css('display', '')
+          // $(this).attr('disabled', false)
         }
       }, 1000);
+    })
+
+    $('#rule').click(function () {
+      $('#container').append(`<img src="./square2.png">`)
+      timer2 = setTimeout(() => {
+        $('#container img').fadeOut(2000)
+      }, 3000)
+    })
+
+    $('#sound').click(function () {
+      if ($(this).attr('src') !== './sound.png') {
+        $(this).attr('src', './sound.png')
+        audio.pause()
+        audio.currentTime = 0
+      } else {
+        $(this).attr('src', './soundoff.png')
+        audio.play()
+      }
     })
 
     $('#container').on('click', '.boxy', function () {
@@ -99,19 +228,19 @@
       $('.box').remove()
       change()
       num += 20
-      num2 += 20
-      $('.box').css("background-color", `rgb(${num}, 128, ${num2})`)
-      $(this).css("background-color", `rgb(${num}, 128, ${num2})`)
-      console.log(num)
-      console.log(num2)
+      $('.box').css("filter", `hue-rotate(${Math.floor(Math.random() * 360) + 1}deg)`)
+      $(this).css("background-color", `rgb(${num}, 150, ${num2})`)
+
       console.log(counter)
-      if (counter == 25) {
+      if (counter == 12) {
         clearInterval(timer)
-        $(this).remove()
+        audio.remove()
+        $('.box').remove()
+        $('#clock').remove()
         Swal.fire({
           icon: 'success',
-          title: '恭喜過關｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡',
-          text: `你得到 ${score} 分`
+          title: '恭喜過關:.ﾟヽ(*´∀`)ﾉﾟ.:',
+          text: `我相信你沒有偷看答案:)`
         })
       }
     })
