@@ -9,13 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Freckle+Face&family=New+Tegomin&display=swap" rel="stylesheet">
   <title>Document</title>
   <style>
-    /* 音量位置 */
     /* 按錯倒扣 -1分跳警告 */
-    /* 遊戲結束消失畫面 */
 
     body {
       font-family: 'Freckle Face', cursive;
       font-family: 'New Tegomin', serif;
+      background-image: url(./images/刺蝟2.jpg);
+      background-repeat: no-repeat;
+      background-position: left top;
+      background-size: cover;
     }
 
     #container img {
@@ -24,7 +26,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-image: url(./bg.jpg);
+      background-image: url(./images/rule.png);
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
@@ -38,7 +40,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-image: url(./bg.jpg);
+      background-image: url(./images/bg.jpg);
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
@@ -79,7 +81,7 @@
 
     #death {
       position: absolute;
-      top: 60%;
+      top: 68%;
       left: 50%;
       transform: translateX(-50%);
       width: 250px;
@@ -116,16 +118,16 @@
 <body>
   <div id="big">
 
-    <img src="./start.png" id="btn-start" width="220px">
-    <img src="./rule.png" id="rule" width="102px">
-    <img src="./sound.png" id="sound" width="102px">
+    <img src="./images/start.png" id="btn-start" width="220px">
+    <img src="./images/rule.png" id="rule" width="102px">
+    <img src="./images/sound.png" id="sound" width="102px">
 
     <div id="container"></div>
   </div>
   <div id="clock">
-    <img src="./clock.png" width="25px">
+    <img src="./images/clock.png" width="25px">
     <span id="text-time"> 0</span>
-    <span id="number">&emsp;&emsp;score:<span id="text-score">0</span></span>
+    <span id="number">&emsp; score:<span id="text-score">0</span></span>
   </div>
   <audio src="./death (2).mp3" id="death" controls></audio>
 
@@ -133,22 +135,19 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script>
     let score = 0
-    let countdown = 10
+    let countdown = 60
+    let counter = 0
     let timer = 0
     let timer2 = 0
     const audio = document.getElementById('death')
     audio.src = './death (2).mp3'
 
-
     const rand = (min, max) => {
       return Math.round(Math.random() * (max - min)) + min
     }
-
-
     let num = rand(200, 201)
     let num2 = rand(100, 101)
     let n = `background-color: rgb(${num},150,${num2})`
-    let counter = 0
 
     const change = () => {
       for (let i = 0; i < 256; i++) {
@@ -170,53 +169,59 @@
       $('#rule').css('display', 'none')
       $('#sound').css('display', 'none')
       $('#big').css('background-image', 'none')
+      // 把音樂蓋在#big上面
+      $('#death').css('z-index', '2')
 
       change()
       $(this).attr('disabled', true)
+      counter = 0
       score = 0
       $('#text-score').text(score)
-      countdown = 10
+      countdown = 60
       $('#text-time').text(countdown)
 
       timer = setInterval(() => {
         countdown--
         $('#text-time').text(countdown)
-
         if (countdown <= 0) {
           clearInterval(timer)
-          audio.remove()
-          $('#container').empty()
-          $('#clock').css('display', 'none')
+          // ***********
+          audio.pause()
+          audio.currentTime = 0
+          $('#death').css('z-index', '0')
+          $('.box').remove()
+
+          // 刷新grid的顏色 
+          num -= counter * 20
+
           Swal.fire({
             icon: 'info',
             title: '殘念！差點就過關了(๑•́ ₃ •̀๑)',
             text: `你得到 ${score} 分`
           })
-
           $('#btn-start').css('display', '')
           $('#rule').css('display', '')
           $('#sound').css('display', '')
-          $('#big').css('background-image', 'url(./bg.jpg)')
-          $('#clock').css('display', '')
+          $('#big').css('background-image', 'url(./images/bg.jpg)')
           // $(this).attr('disabled', false)
         }
       }, 1000);
     })
 
     $('#rule').click(function () {
-      $('#container').append(`<img src="./square2.png">`)
+      $('#container').append(`<img src="./images/square2.png">`)
       timer2 = setTimeout(() => {
         $('#container img').fadeOut(2000)
       }, 3000)
     })
 
     $('#sound').click(function () {
-      if ($(this).attr('src') !== './sound.png') {
-        $(this).attr('src', './sound.png')
+      if ($(this).attr('src') !== './images/sound.png') {
+        $(this).attr('src', './images/sound.png')
         audio.pause()
         audio.currentTime = 0
       } else {
-        $(this).attr('src', './soundoff.png')
+        $(this).attr('src', './images/soundoff.png')
         audio.play()
       }
     })
@@ -228,20 +233,27 @@
       $('.box').remove()
       change()
       num += 20
+
       $('.box').css("filter", `hue-rotate(${Math.floor(Math.random() * 360) + 1}deg)`)
       $(this).css("background-color", `rgb(${num}, 150, ${num2})`)
 
-      console.log(counter)
       if (counter == 12) {
+        num -= counter * 20
         clearInterval(timer)
-        audio.remove()
+        // ***********
+        audio.pause()
+        audio.currentTime = 0
+        $('#death').css('z-index', '0')
         $('.box').remove()
-        $('#clock').remove()
         Swal.fire({
           icon: 'success',
           title: '恭喜過關:.ﾟヽ(*´∀`)ﾉﾟ.:',
           text: `我相信你沒有偷看答案:)`
         })
+        $('#btn-start').css('display', '')
+        $('#rule').css('display', '')
+        $('#sound').css('display', '')
+        $('#big').css('background-image', 'url(./images/bg.jpg)')
       }
     })
 
