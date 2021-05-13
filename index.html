@@ -10,7 +10,6 @@
   <title>Document</title>
   <style>
     /* 按錯倒扣 -1分跳警告 */
-    /* 淡出淡入 */
 
     body {
       font-family: 'Freckle Face', cursive;
@@ -33,7 +32,7 @@
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
-      transition: opacity 1s;
+      /* transition: opacity 1s; */
     }
 
     #big {
@@ -143,7 +142,6 @@
     let timer = 0
     let timer2 = 0
     const audio = document.getElementById('death')
-    audio.src = './death (2).mp3'
 
     const rand = (min, max) => {
       return Math.round(Math.random() * (max - min)) + min
